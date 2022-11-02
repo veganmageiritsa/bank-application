@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: gatewayserver
+  config:
+    import: optional:configserver:http://localhost:8071
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+  sleuth:
+    sampler:
+      probability: 1
+  zipkin:
+    base-url: http://localhost:9411
+
+management:
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+info:
+  app:
+    name: GateWay Server
+    description: Bank Application
+    version: 1.0.0
+logging:
+  level:
+    com:
+      bank:
+        application:
+          gatewayserver: DEBUG

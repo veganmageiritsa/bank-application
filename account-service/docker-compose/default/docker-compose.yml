@@ -1,0 +1,143 @@
+version: "3.8"
+
+services:
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - bank-network
+
+  configserver:
+    image: bank/config-server:latest
+    ports:
+      - "8071:8071"
+    depends_on:
+      - zipkin
+    networks:
+      - bank-network
+    environment:
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+
+  eurekaserver:
+    image: bank/eureka-server:latest
+    ports:
+      - "8070:8070"
+    depends_on:
+     - configserver
+    deploy:
+       restart_policy:
+         condition: on-failure
+         delay: 5s
+         max_attempts: 3
+         window: 120s
+    environment:
+       SPRING_PROFILES_ACTIVE: default
+       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+       SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+    networks:
+      - bank-network
+
+  accounts:
+    image: bank/account-service:latest
+    depends_on:
+      - db
+      - configserver
+      - eurekaserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bank?currentSchema=account&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    ports:
+      - "8087:8087"
+    networks:
+      - bank-network
+
+  loans:
+    image: bank/loan-service:latest
+    depends_on:
+      - db
+      - configserver
+      - eurekaserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bank?currentSchema=loan&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    ports:
+      - "8089:8089"
+    networks:
+      - bank-network
+
+  cards:
+    image: bank/card-service:latest
+    depends_on:
+      - db
+      - configserver
+      - eurekaserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bank?currentSchema=card&binaryTransfer=true&reWriteBatchedInserts=true
+    ports:
+      - "8088:8088"
+    networks:
+      - bank-network
+  db:
+    image: 'postgres'
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=B3@gl3
+      - POSTGRES_DB=bank
+    networks:
+      - bank-network
+  gatewayserver:
+    image: bank/gateway-server:latest
+    ports:
+      - "8072:8072"
+    networks:
+      - bank-network
+    depends_on:
+      - configserver
+      - eurekaserver
+      - cards
+      - loans
+      - accounts
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 45s
+        max_attempts: 3
+        window: 180s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+networks:
+  bank-network:

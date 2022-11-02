@@ -1,0 +1,18 @@
+
+X	java:S125"<This block of commented-out lines of code should be removed.(ë²ö¥8£®˜Ë¿0
+u
+java:S1128"SRemove this unused import 'org.springframework.beans.factory.annotation.Autowired'.(¡¸Îùÿÿÿÿ8€£ö¦¿0
+o
+java:S1128"RRemove this unused import 'org.springframework.cloud.gateway.filter.GlobalFilter'.(ä•¦Ü8¤®˜Ë¿0
+e
+java:S1128"HRemove this unused import 'org.springframework.context.annotation.Bean'.(‚î‰Ş8¤®˜Ë¿0
+s
+java:S1128"QRemove this unused import 'org.springframework.context.annotation.Configuration'.(¬²Úäşÿÿÿÿ8¥®˜Ë¿0
+c
+java:S1128"ARemove this unused import 'org.springframework.http.HttpHeaders'.(ãŸñ×úÿÿÿÿ8¦®˜Ë¿0
+Z
+java:S1128	"8Remove this unused import 'reactor.core.publisher.Mono'.(²îöØÿÿÿÿÿ8¦®˜Ë¿0
+I
+java:S1128"-Remove this unused import 'org.slf4j.Logger'.(íØ®68§®˜Ë¿0
+Q
+java:S1128"4Remove this unused import 'org.slf4j.LoggerFactory'.(–ÿÚŞ8§®˜Ë¿0
